@@ -1,7 +1,7 @@
 const { getModule } = require("powercord/webpack");
 const { getChannel } = getModule(["getChannel"], false);
 const { getChannelId } = getModule(["getLastSelectedChannelId"], false);
-const currentChannelID = getChannel(getChannelId());
+const currentChannelID = getChannel(getChannelId()).id;
 
 
 module.exports = class Handler {
@@ -12,8 +12,21 @@ module.exports = class Handler {
     }
 
     onCreate(event) {
-        const { message } = event
-        let { id, content, guild_id, channel_id } = message;
-        if (currentChannelID == channel_id) console.log(message);
+        try {
+            // filtering from https://github.com/Vendicated/PowercordWordNotifications/blob/main/handler.js#L65
+            if (!event) return;
+      
+            const { message } = event;
+            if (!message || !message.author || message.author.bot || !message.content || message.state === "SENDING") return;
+
+            // handling the message :3
+            let { id, content, guild_id, channel_id } = message;
+            if (currentChannelID == channel_id) {
+                if (!this.cache.get(id)) this.cache.set(id, message);
+            }
+
+        } catch (error) {
+            console.error(error);
+        }
     }
 }

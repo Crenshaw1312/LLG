@@ -29,6 +29,7 @@ module.exports = class LLG extends Plugin {
 
     pluginWillUnload() {
         FluxDispatcher.unsubscribe("MESSAGE_CREATE", this.onCreate)
+        powercord.api.settings.unregisterSettings('LLG')
         console.log("bye!");
     }
 
